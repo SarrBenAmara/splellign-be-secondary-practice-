@@ -1,0 +1,1166 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spelling Duel Arena</title>
+  <style>
+    body {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Cinzel', 'Playfair Display', Georgia, serif;
+      background: #0a0a0f;
+      color: #f0e6d2;
+      overflow: hidden;
+      height: 100%;
+      width: 100%;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+/* ⭐ LOGO — added */
+    .page-logo {
+      position: fixed;
+      top: 80px;
+      right: 80px;
+      width: 200px;
+      height: auto;
+      z-index: 999;
+    }
+    .game-container {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 100%);
+    }
+
+    /* Honeycomb Background Pattern */
+    .honeycomb-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0.08;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Header Section */
+    .header {
+      text-align: center;
+      padding: 2% 0 1% 0;
+      position: relative;
+      z-index: 10;
+    }
+
+    .queen-throne {
+      width: 4%;
+      height: auto;
+      margin: 0 auto 1%;
+      filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.6));
+    }
+
+    .game-title {
+      font-size: 2em;
+      font-weight: 700;
+      letter-spacing: 3px;
+      margin: 0 0 0.5%;
+      text-transform: uppercase;
+      background: linear-gradient(90deg, #3a86ff, #d4af37);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Word Display */
+    .word-display {
+      background: linear-gradient(135deg, #1e1e3f 0%, #2a2a4a 100%);
+      border: 2px solid #d4af37;
+      padding: 3% 5%;
+      margin: 0 auto 2%;
+      max-width: 50%;
+      clip-path: polygon(10% 0%, 90% 0%, 100% 10%, 100% 90%, 90% 100%, 10% 100%, 0% 90%, 0% 10%);
+      position: relative;
+      animation: slideDown 0.6s ease-out;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .word-text {
+      font-size: 2.5em;
+      font-weight: 700;
+      text-align: center;
+      letter-spacing: 4px;
+      color: #f0e6d2;
+      text-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+    }
+
+    /* Arena Section */
+    .arena {
+      display: flex;
+      flex: 1;
+      gap: 2%;
+      padding: 0 3% 2% 3%;
+      position: relative;
+      z-index: 5;
+    }
+
+    .player-zone {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 3%;
+      padding: 3%;
+      background: rgba(20, 20, 40, 0.6);
+      border-radius: 15px;
+      position: relative;
+      backdrop-filter: blur(10px);
+    }
+
+    .player-zone.blue {
+      border: 2px solid #3a86ff;
+      box-shadow: 0 0 30px rgba(58, 134, 255, 0.3);
+    }
+
+    .player-zone.gold {
+      border: 2px solid #d4af37;
+      box-shadow: 0 0 30px rgba(212, 175, 55, 0.3);
+    }
+
+    .player-header {
+      text-align: center;
+    }
+
+    .player-emblem {
+      width: 15%;
+      height: auto;
+      margin: 0 auto 2%;
+      filter: drop-shadow(0 0 10px currentColor);
+    }
+
+    .player-name {
+      font-size: 1.8em;
+      font-weight: 700;
+      letter-spacing: 2px;
+      margin: 0;
+    }
+
+    .blue .player-name {
+      color: #3a86ff;
+    }
+
+    .gold .player-name {
+      color: #d4af37;
+    }
+
+    /* Input Section */
+    .input-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 3%;
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    .spell-input {
+      width: 100%;
+      padding: 4%;
+      font-size: 1.8em;
+      font-family: 'Courier New', monospace;
+      text-align: center;
+      background: rgba(10, 10, 20, 0.8);
+      border: 3px solid;
+      border-radius: 10px;
+      color: #f0e6d2;
+      letter-spacing: 3px;
+      transition: all 0.3s ease;
+      outline: none;
+    }
+
+    .blue .spell-input {
+      border-color: #3a86ff;
+    }
+
+    .gold .spell-input {
+      border-color: #d4af37;
+    }
+
+    .spell-input:focus {
+      box-shadow: 0 0 20px currentColor;
+      transform: scale(1.02);
+    }
+
+    .spell-input.correct {
+      border-color: #2ecc71;
+      background: rgba(46, 204, 113, 0.1);
+      animation: successPulse 0.5s ease;
+    }
+
+    .spell-input.incorrect {
+      border-color: #e74c3c;
+    }
+
+    @keyframes successPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 4%;
+      font-size: 1.5em;
+      font-family: 'Cinzel', Georgia, serif;
+      font-weight: 700;
+      border: 3px solid;
+      border-radius: 10px;
+      cursor: pointer;
+      letter-spacing: 2px;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      margin-top: 3%;
+    }
+
+    .blue .submit-btn {
+      background: rgba(58, 134, 255, 0.2);
+      border-color: #3a86ff;
+      color: #3a86ff;
+    }
+
+    .gold .submit-btn {
+      background: rgba(212, 175, 55, 0.2);
+      border-color: #d4af37;
+      color: #d4af37;
+    }
+
+    .submit-btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 0 20px currentColor;
+    }
+
+    .blue .submit-btn:hover:not(:disabled) {
+      background: rgba(58, 134, 255, 0.4);
+    }
+
+    .gold .submit-btn:hover:not(:disabled) {
+      background: rgba(212, 175, 55, 0.4);
+    }
+
+    .submit-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Timer Display */
+    .timer-section {
+      text-align: center;
+      margin-bottom: 3%;
+    }
+
+    .timer-label {
+      font-size: 0.9em;
+      opacity: 0.7;
+      margin-bottom: 2%;
+      letter-spacing: 1px;
+    }
+
+    .timer-display {
+      font-size: 3em;
+      font-weight: 700;
+      font-family: 'Courier New', monospace;
+      letter-spacing: 3px;
+    }
+
+    .blue .timer-display {
+      color: #3a86ff;
+      text-shadow: 0 0 15px rgba(58, 134, 255, 0.5);
+    }
+
+    .gold .timer-display {
+      color: #d4af37;
+      text-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+    }
+
+    .timer-display.warning {
+      animation: timerPulse 1s ease-in-out infinite;
+    }
+
+    @keyframes timerPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); color: #e74c3c; }
+    }
+
+    /* Progress Bar */
+    .progress-section {
+      text-align: center;
+    }
+
+    .progress-label {
+      font-size: 1em;
+      margin-bottom: 2%;
+      opacity: 0.8;
+      letter-spacing: 1px;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 15px;
+      background: rgba(10, 10, 20, 0.8);
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid;
+    }
+
+    .blue .progress-bar {
+      border-color: #3a86ff;
+    }
+
+    .gold .progress-bar {
+      border-color: #d4af37;
+    }
+
+    .progress-fill {
+      height: 100%;
+      transition: width 0.5s ease;
+      background: linear-gradient(90deg, transparent, currentColor);
+    }
+
+    .blue .progress-fill {
+      color: #3a86ff;
+    }
+
+    .gold .progress-fill {
+      color: #d4af37;
+    }
+
+    /* Score Display */
+    .score-section {
+      text-align: center;
+      padding: 3% 0;
+    }
+
+    .score-label {
+      font-size: 1em;
+      opacity: 0.8;
+      margin-bottom: 2%;
+    }
+
+    .score-value {
+      font-size: 3em;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 3%;
+    }
+
+    .bee-icon {
+      width: 12%;
+      height: auto;
+      filter: drop-shadow(0 0 8px currentColor);
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 1.5% 0;
+      font-size: 1.2em;
+      letter-spacing: 2px;
+      opacity: 0.9;
+      background: rgba(10, 10, 20, 0.6);
+    }
+
+    /* Setup Screen */
+    .setup-screen {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(10, 10, 15, 0.95);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 3%;
+    }
+
+    .setup-content {
+      background: linear-gradient(135deg, #1e1e3f 0%, #2a2a4a 100%);
+      padding: 2.5% 3%;
+      border-radius: 20px;
+      border: 3px solid #d4af37;
+      max-width: 60%;
+      text-align: center;
+      box-shadow: 0 0 40px rgba(212, 175, 55, 0.4);
+    }
+
+    .setup-title {
+      font-size: 2em;
+      margin-bottom: 2%;
+      background: linear-gradient(90deg, #3a86ff, #d4af37);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .name-entry-section {
+      margin: 2% 0;
+      display: flex;
+      gap: 3%;
+      justify-content: center;
+    }
+
+    .player-name-input {
+      flex: 1;
+      max-width: 45%;
+    }
+
+    .input-label {
+      font-size: 0.95em;
+      margin-bottom: 1.5%;
+      display: block;
+      letter-spacing: 1px;
+      opacity: 0.9;
+    }
+
+    .blue-label {
+      color: #3a86ff;
+    }
+
+    .gold-label {
+      color: #d4af37;
+    }
+
+    .name-input {
+      width: 100%;
+      padding: 3%;
+      font-size: 1.1em;
+      font-family: 'Cinzel', Georgia, serif;
+      text-align: center;
+      background: rgba(10, 10, 20, 0.8);
+      border: 2px solid;
+      border-radius: 8px;
+      color: #f0e6d2;
+      letter-spacing: 2px;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .name-input.blue-input {
+      border-color: #3a86ff;
+    }
+
+    .name-input.gold-input {
+      border-color: #d4af37;
+    }
+
+    .name-input:focus {
+      box-shadow: 0 0 15px currentColor;
+      transform: scale(1.02);
+    }
+
+    .name-input.blue-input:focus {
+      box-shadow: 0 0 15px rgba(58, 134, 255, 0.6);
+    }
+
+    .name-input.gold-input:focus {
+      box-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
+    }
+
+    .setup-options {
+      display: flex;
+      gap: 2.5%;
+      justify-content: center;
+      margin-top: 2.5%;
+    }
+
+    .round-btn {
+      padding: 3% 6%;
+      font-size: 1.2em;
+      font-family: 'Cinzel', Georgia, serif;
+      background: rgba(58, 134, 255, 0.2);
+      border: 2px solid #3a86ff;
+      color: #f0e6d2;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      letter-spacing: 2px;
+    }
+
+    .round-btn:hover {
+      background: rgba(58, 134, 255, 0.4);
+      box-shadow: 0 0 20px rgba(58, 134, 255, 0.6);
+      transform: translateY(-2px);
+    }
+    
+    .setup-section-label {
+      font-size: 1.1em;
+      margin: 2% 0 1.5%;
+      opacity: 0.9;
+    }
+
+    /* Victory Screen */
+    .victory-screen {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(10, 10, 15, 0.95);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .victory-content {
+      text-align: center;
+      padding: 4%;
+    }
+
+    .champion-title {
+      font-size: 3em;
+      margin-bottom: 3%;
+      background: linear-gradient(90deg, #d4af37, #ffd700);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: glow 2s ease-in-out infinite;
+    }
+
+    @keyframes glow {
+      0%, 100% { filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.6)); }
+      50% { filter: drop-shadow(0 0 25px rgba(212, 175, 55, 1)); }
+    }
+
+    .champion-name {
+      font-size: 2.5em;
+      margin: 3% 0;
+    }
+
+    .final-score {
+      font-size: 2em;
+      margin: 3% 0;
+      opacity: 0.9;
+    }
+
+    .crown-icon {
+      width: 15%;
+      height: auto;
+      margin: 3% auto;
+      animation: crownFloat 3s ease-in-out infinite;
+    }
+
+    @keyframes crownFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-15px); }
+    }
+
+    .play-again-btn {
+      padding: 3% 6%;
+      font-size: 1.5em;
+      font-family: 'Cinzel', Georgia, serif;
+      background: linear-gradient(135deg, #d4af37, #ffd700);
+      border: none;
+      color: #0a0a0f;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-top: 4%;
+      font-weight: 700;
+      letter-spacing: 2px;
+      transition: all 0.3s ease;
+    }
+
+    .play-again-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 30px rgba(212, 175, 55, 0.8);
+    }
+
+    /* Badge Animation */
+    .badge-animation {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 25%;
+      height: auto;
+      opacity: 0;
+      z-index: 50;
+      pointer-events: none;
+    }
+
+    .badge-animation.show {
+      animation: badgeAppear 1s ease-out;
+    }
+
+    @keyframes badgeAppear {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0) rotate(-180deg);
+      }
+      50% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.3) rotate(0deg);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(1) rotate(0deg);
+      }
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
+ </head>
+ <body>
+ <!-- ⭐ LOGO — added here -->
+  <img src="logo.png" class="page-logo" alt="Logo">
+  <div class="game-container"><!-- Honeycomb Background -->
+   <svg class="honeycomb-bg" xmlns="http://www.w3.org/2000/svg"><defs>
+     <pattern id="hexagons" width="100" height="87" patternunits="userSpaceOnUse">
+      <polygon points="50,0 93.3,25 93.3,75 50,100 6.7,75 6.7,25" fill="none" stroke="#d4af37" stroke-width="1" />
+     </pattern>
+    </defs> <rect width="100%" height="100%" fill="url(#hexagons)" />
+   </svg><!-- Setup Screen -->
+   <div class="setup-screen" id="setupScreen">
+    <div class="setup-content">
+     <svg class="queen-throne" viewbox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M50,30 L45,40 L35,35 L40,50 L30,55 L35,65 L30,75 L40,80 L35,90 L50,85 L65,90 L60,80 L70,75 L65,65 L70,55 L60,50 L65,35 L55,40 Z" fill="#d4af37" stroke="#ffd700" stroke-width="2" /> <ellipse cx="50" cy="50" rx="8" ry="12" fill="#0a0a0f" /> <path d="M45,30 L50,20 L55,30" fill="#d4af37" /> <circle cx="50" cy="18" r="4" fill="#ff6b6b" /> <path d="M30,90 L35,95 L40,90" fill="#d4af37" /> <path d="M60,90 L65,95 L70,90" fill="#d4af37" />
+     </svg>
+     <h1 class="setup-title">SPELLING DUEL ARENA</h1>
+     <p class="setup-section-label">Enter Player Names</p>
+     <div class="name-entry-section">
+      <div class="player-name-input"><label class="input-label blue-label">Player 1 (Blue)</label> <input type="text" id="player1NameInput" class="name-input blue-input" placeholder="Enter name..." maxlength="20" value="Champion Blue">
+      </div>
+      <div class="player-name-input"><label class="input-label gold-label">Player 2 (Gold)</label> <input type="text" id="player2NameInput" class="name-input gold-input" placeholder="Enter name..." maxlength="20" value="Champion Gold">
+      </div>
+     </div>
+     <p class="setup-section-label">Select Number of Rounds</p>
+     <div class="setup-options"><button class="round-btn" onclick="startGame(5)">5 Rounds</button> <button class="round-btn" onclick="startGame(10)">10 Rounds</button> <button class="round-btn" onclick="startGame(15)">15 Rounds</button>
+     </div>
+    </div>
+   </div><!-- Header -->
+   <div class="header">
+    <svg class="queen-throne" viewbox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M50,30 L45,40 L35,35 L40,50 L30,55 L35,65 L30,75 L40,80 L35,90 L50,85 L65,90 L60,80 L70,75 L65,65 L70,55 L60,50 L65,35 L55,40 Z" fill="#d4af37" stroke="#ffd700" stroke-width="2" /> <ellipse cx="50" cy="50" rx="8" ry="12" fill="#0a0a0f" /> <path d="M45,30 L50,20 L55,30" fill="#d4af37" /> <circle cx="50" cy="18" r="4" fill="#ff6b6b" />
+    </svg>
+    <h1 class="game-title" id="gameTitle">Spelling Duel Arena</h1>
+   </div><!-- Word Display -->
+   <div class="word-display" id="wordDisplay">
+    <div class="word-text" id="wordText">
+     READY
+    </div>
+   </div><!-- Arena -->
+   <div class="arena"><!-- Player 1 Zone (Blue) -->
+    <div class="player-zone blue">
+     <div class="player-header">
+      <svg class="player-emblem" viewbox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M50,30 L45,40 L35,35 L40,50 L30,55 L35,65 L30,75 L40,80 L35,90 L50,85 L65,90 L60,80 L70,75 L65,65 L70,55 L60,50 L65,35 L55,40 Z" fill="#3a86ff" stroke="#5ba3ff" stroke-width="2" /> <ellipse cx="50" cy="50" rx="8" ry="12" fill="#0a0a0f" /> <path d="M45,30 L50,20 L55,30" fill="#3a86ff" />
+      </svg>
+      <h2 class="player-name" id="player1Name">Champion Blue</h2>
+     </div>
+     <div class="input-section">
+      <div class="timer-section">
+       <div class="timer-label">
+        Time Remaining
+       </div>
+       <div class="timer-display" id="player1Timer">
+        30
+       </div>
+      </div>
+      <div class="input-wrapper"><input type="text" class="spell-input" id="player1Input" placeholder="Type the word..." autocomplete="off" spellcheck="false">
+      </div><button class="submit-btn" id="player1Submit" onclick="submitAnswer(1)">Submit Answer</button>
+      <div class="progress-section">
+       <div class="progress-label">
+        Gathering Honey
+       </div>
+       <div class="progress-bar">
+        <div class="progress-fill" id="player1Progress" style="width: 0%;"></div>
+       </div>
+      </div>
+     </div>
+     <div class="score-section">
+      <div class="score-label">
+       Bee Badges
+      </div>
+      <div class="score-value">
+       <svg class="bee-icon" viewbox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><ellipse cx="50" cy="50" rx="15" ry="20" fill="#d4af37" /> <ellipse cx="50" cy="40" rx="12" ry="8" fill="#0a0a0f" /> <ellipse cx="50" cy="55" rx="12" ry="8" fill="#0a0a0f" /> <path d="M35,45 Q25,40 20,45 Q25,50 35,50 Z" fill="#3a86ff" opacity="0.7" /> <path d="M65,45 Q75,40 80,45 Q75,50 65,50 Z" fill="#3a86ff" opacity="0.7" />
+       </svg><span id="player1Score">0</span>
+      </div>
+     </div>
+    </div><!-- Player 2 Zone (Gold) -->
+    <div class="player-zone gold">
+     <div class="player-header">
+      <svg class="player-emblem" viewbox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M50,30 L45,40 L35,35 L40,50 L30,55 L35,65 L30,75 L40,80 L35,90 L50,85 L65,90 L60,80 L70,75 L65,65 L70,55 L60,50 L65,35 L55,40 Z" fill="#d4af37" stroke="#ffd700" stroke-width="2" /> <ellipse cx="50" cy="50" rx="8" ry="12" fill="#0a0a0f" /> <path d="M45,30 L50,20 L55,30" fill="#d4af37" />
+      </svg>
+      <h2 class="player-name" id="player2Name">Champion Gold</h2>
+     </div>
+     <div class="input-section">
+      <div class="timer-section">
+       <div class="timer-label">
+        Time Remaining
+       </div>
+       <div class="timer-display" id="player2Timer">
+        30
+       </div>
+      </div>
+      <div class="input-wrapper"><input type="text" class="spell-input" id="player2Input" placeholder="Type the word..." autocomplete="off" spellcheck="false">
+      </div><button class="submit-btn" id="player2Submit" onclick="submitAnswer(2)">Submit Answer</button>
+      <div class="progress-section">
+       <div class="progress-label">
+        Gathering Honey
+       </div>
+       <div class="progress-bar">
+        <div class="progress-fill" id="player2Progress" style="width: 0%;"></div>
+       </div>
+      </div>
+     </div>
+     <div class="score-section">
+      <div class="score-label">
+       Bee Badges
+      </div>
+      <div class="score-value">
+       <svg class="bee-icon" viewbox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><ellipse cx="50" cy="50" rx="15" ry="20" fill="#d4af37" /> <ellipse cx="50" cy="40" rx="12" ry="8" fill="#0a0a0f" /> <ellipse cx="50" cy="55" rx="12" ry="8" fill="#0a0a0f" /> <path d="M35,45 Q25,40 20,45 Q25,50 35,50 Z" fill="#d4af37" opacity="0.7" /> <path d="M65,45 Q75,40 80,45 Q75,50 65,50 Z" fill="#d4af37" opacity="0.7" />
+       </svg><span id="player2Score">0</span>
+      </div>
+     </div>
+    </div>
+   </div><!-- Footer -->
+   <div class="footer" id="footer"><span id="roundDisplay">Round 1 of 10</span>
+   </div><!-- Badge Animation -->
+   <svg class="badge-animation" id="badgeAnimation" viewbox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><defs>
+     <radialgradient id="crownGlow">
+      <stop offset="0%" stop-color="#ffd700" stop-opacity="1" />
+      <stop offset="100%" stop-color="#d4af37" stop-opacity="0" />
+     </radialgradient>
+    </defs> <circle cx="50" cy="50" r="45" fill="url(#crownGlow)" opacity="0.3" /> <path d="M30,60 L35,50 L40,60 L45,50 L50,60 L55,50 L60,60 L65,50 L70,60 L50,85 Z" fill="#d4af37" stroke="#ffd700" stroke-width="2" /> <path d="M50,30 L45,40 L35,35 L40,50 L30,55 L35,65 L30,70 L50,65 L70,70 L65,65 L70,55 L60,50 L65,35 L55,40 Z" fill="#ffd700" stroke="#d4af37" stroke-width="2" /> <ellipse cx="50" cy="50" rx="10" ry="15" fill="#0a0a0f" /> <path d="M45,30 L50,15 L55,30" fill="#ffd700" /> <circle cx="50" cy="12" r="6" fill="#ff6b6b" stroke="#ffd700" stroke-width="2" /> <path d="M35,45 Q25,40 20,45 Q25,50 35,50 Z" fill="#d4af37" opacity="0.5" /> <path d="M65,45 Q75,40 80,45 Q75,50 65,50 Z" fill="#d4af37" opacity="0.5" />
+   </svg><!-- Victory Screen -->
+   <div class="victory-screen" id="victoryScreen">
+    <div class="victory-content">
+     <svg class="crown-icon" viewbox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><defs>
+       <radialgradient id="victoryGlow">
+        <stop offset="0%" stop-color="#ffd700" stop-opacity="0.8" />
+        <stop offset="100%" stop-color="#d4af37" stop-opacity="0" />
+       </radialgradient>
+      </defs> <circle cx="50" cy="50" r="48" fill="url(#victoryGlow)" /> <path d="M30,60 L35,50 L40,60 L45,50 L50,60 L55,50 L60,60 L65,50 L70,60 L50,85 Z" fill="#d4af37" stroke="#ffd700" stroke-width="3" /> <path d="M45,30 L50,10 L55,30" fill="#ffd700" /> <circle cx="50" cy="8" r="8" fill="#ff6b6b" stroke="#ffd700" stroke-width="3" /> <circle cx="35" cy="52" r="4" fill="#ff6b6b" /> <circle cx="50" cy="52" r="4" fill="#ff6b6b" /> <circle cx="65" cy="52" r="4" fill="#ff6b6b" />
+     </svg>
+     <h1 class="champion-title">CHAMPION OF THE HIVE</h1>
+     <h2 class="champion-name" id="winnerName">Player Name</h2>
+     <p class="final-score" id="finalScore">10 Bee Badges</p><button class="play-again-btn" onclick="resetGame()">DUEL AGAIN</button>
+    </div>
+   </div>
+  </div>
+  <script src="/_sdk/element_sdk.js"></script>
+  <script>
+    const defaultConfig = {
+      game_title: "Spelling Duel Arena",
+      player1_name: "Champion Blue",
+      player2_name: "Champion Gold"
+    };
+
+    const words = [
+      "abdicate", "aberration", "abstain", "acquiesce", "adversity",
+      "aesthetic", "alleviate", "ambivalent", "anomaly", "antagonize",
+      "apathy", "arbitrary", "articulate", "ascertain", "aspiration",
+      "audacious", "authenticity", "belligerent", "benign", "boisterous",
+      "candor", "catalyst", "censure", "circumvent", "coherent",
+      "conducive", "connoisseur", "conspicuous", "contemplate", "credible",
+      "cumulative", "debilitate", "decree", "deference", "delineate",
+      "denounce", "derivative", "detrimental", "devious", "digress",
+      "diligent", "discern", "discord", "discretion", "disparage",
+      "disposition", "dormant", "eccentric"
+    ];
+
+    let gameState = {
+      totalRounds: 10,
+      currentRound: 1,
+      player1Score: 0,
+      player2Score: 0,
+      currentWord: "",
+      scrambledWord: "",
+      wordPool: [],
+      roundLocked: false,
+      timeRemaining: 30,
+      timerInterval: null,
+      currentPlayer: 1,
+      player1Answered: false
+    };
+
+    function shuffleArray(array) {
+      const newArray = [...array];
+      for (let i = newArray.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+      }
+      return newArray;
+    }
+
+    function scrambleWord(word) {
+      const letters = word.split('');
+      let scrambled;
+      do {
+        scrambled = shuffleArray(letters).join('');
+      } while (scrambled === word && word.length > 1);
+      return scrambled;
+    }
+
+    function startGame(rounds) {
+      const player1Input = document.getElementById('player1NameInput');
+      const player2Input = document.getElementById('player2NameInput');
+      
+      const player1Name = player1Input.value.trim() || 'Champion Blue';
+      const player2Name = player2Input.value.trim() || 'Champion Gold';
+      
+      if (window.elementSdk) {
+        window.elementSdk.setConfig({
+          player1_name: player1Name,
+          player2_name: player2Name
+        });
+      }
+      
+      document.getElementById('player1Name').textContent = player1Name;
+      document.getElementById('player2Name').textContent = player2Name;
+      
+      gameState.totalRounds = rounds;
+      gameState.currentRound = 1;
+      gameState.player1Score = 0;
+      gameState.player2Score = 0;
+      gameState.wordPool = shuffleArray(words);
+      gameState.roundLocked = false;
+      gameState.currentPlayer = 1;
+      gameState.player1Answered = false;
+
+      const setupScreen = document.getElementById('setupScreen');
+      setupScreen.style.display = 'none';
+
+      updateScores();
+      updateRoundDisplay();
+      loadNextWord();
+    }
+
+    function startTimer() {
+      if (gameState.timerInterval) {
+        clearInterval(gameState.timerInterval);
+      }
+
+      gameState.timeRemaining = 30;
+      updateTimerDisplay();
+
+      gameState.timerInterval = setInterval(() => {
+        gameState.timeRemaining--;
+        updateTimerDisplay();
+
+        if (gameState.timeRemaining <= 0) {
+          clearInterval(gameState.timerInterval);
+          handleTimeout();
+        }
+      }, 1000);
+    }
+
+    function switchToPlayer2() {
+      gameState.currentPlayer = 2;
+      gameState.timeRemaining = 30;
+      
+      const player2Input = document.getElementById('player2Input');
+      const player2Submit = document.getElementById('player2Submit');
+      
+      player2Input.disabled = false;
+      player2Submit.disabled = false;
+      player2Input.focus();
+      
+      startTimer();
+    }
+
+    function updateTimerDisplay() {
+      const timer1 = document.getElementById('player1Timer');
+      const timer2 = document.getElementById('player2Timer');
+      
+      if (gameState.currentPlayer === 1) {
+        timer1.textContent = gameState.timeRemaining;
+        timer2.textContent = '--';
+        
+        if (gameState.timeRemaining <= 10) {
+          timer1.classList.add('warning');
+        } else {
+          timer1.classList.remove('warning');
+        }
+        timer2.classList.remove('warning');
+      } else {
+        timer1.textContent = '--';
+        timer2.textContent = gameState.timeRemaining;
+        
+        if (gameState.timeRemaining <= 10) {
+          timer2.classList.add('warning');
+        } else {
+          timer2.classList.remove('warning');
+        }
+        timer1.classList.remove('warning');
+      }
+    }
+
+    function handleTimeout() {
+      if (gameState.currentPlayer === 1 && !gameState.player1Answered) {
+        gameState.player1Answered = true;
+        const player1Input = document.getElementById('player1Input');
+        const player1Submit = document.getElementById('player1Submit');
+        player1Input.disabled = true;
+        player1Submit.disabled = true;
+        
+        switchToPlayer2();
+      } else {
+        gameState.roundLocked = true;
+        
+        const player1Input = document.getElementById('player1Input');
+        const player2Input = document.getElementById('player2Input');
+        const player1Submit = document.getElementById('player1Submit');
+        const player2Submit = document.getElementById('player2Submit');
+        
+        player1Input.disabled = true;
+        player2Input.disabled = true;
+        player1Submit.disabled = true;
+        player2Submit.disabled = true;
+
+        setTimeout(() => {
+          gameState.currentRound++;
+          
+          if (gameState.currentRound > gameState.totalRounds) {
+            endGame();
+          } else {
+            updateRoundDisplay();
+            loadNextWord();
+          }
+        }, 2000);
+      }
+    }
+
+    function loadNextWord() {
+      if (gameState.wordPool.length === 0) {
+        gameState.wordPool = shuffleArray(words);
+      }
+
+      gameState.currentWord = gameState.wordPool.pop();
+      gameState.scrambledWord = scrambleWord(gameState.currentWord);
+      gameState.roundLocked = false;
+      gameState.currentPlayer = 1;
+      gameState.player1Answered = false;
+
+      const wordDisplay = document.getElementById('wordDisplay');
+      const wordText = document.getElementById('wordText');
+      
+      wordDisplay.style.animation = 'none';
+      setTimeout(() => {
+        wordText.textContent = gameState.scrambledWord.toUpperCase();
+        wordDisplay.style.animation = 'slideDown 0.6s ease-out';
+      }, 10);
+
+      const player1Input = document.getElementById('player1Input');
+      const player2Input = document.getElementById('player2Input');
+      const player1Submit = document.getElementById('player1Submit');
+      const player2Submit = document.getElementById('player2Submit');
+      
+      player1Input.value = '';
+      player2Input.value = '';
+      player1Input.classList.remove('correct', 'incorrect');
+      player2Input.classList.remove('correct', 'incorrect');
+      
+      player1Input.disabled = false;
+      player1Submit.disabled = false;
+      player2Input.disabled = true;
+      player2Submit.disabled = true;
+
+      document.getElementById('player1Progress').style.width = '0%';
+      document.getElementById('player2Progress').style.width = '0%';
+
+      startTimer();
+      player1Input.focus();
+    }
+
+    function submitAnswer(playerNum) {
+      if (gameState.roundLocked) return;
+      if (playerNum !== gameState.currentPlayer) return;
+
+      const input = document.getElementById(`player${playerNum}Input`);
+      const typed = input.value.toLowerCase().trim();
+      const target = gameState.currentWord.toLowerCase();
+
+      if (typed === target) {
+        clearInterval(gameState.timerInterval);
+        
+        input.classList.add('correct');
+        input.disabled = true;
+        
+        const submitBtn = document.getElementById(`player${playerNum}Submit`);
+        submitBtn.disabled = true;
+
+        if (playerNum === 1) {
+          gameState.player1Score++;
+          gameState.player1Answered = true;
+          
+          showBadgeAnimation();
+          updateScores();
+          
+          setTimeout(() => {
+            // Load a new word for Player 2
+            if (gameState.wordPool.length === 0) {
+              gameState.wordPool = shuffleArray(words);
+            }
+            gameState.currentWord = gameState.wordPool.pop();
+            gameState.scrambledWord = scrambleWord(gameState.currentWord);
+            
+            // Update the word display
+            const wordText = document.getElementById('wordText');
+            wordText.textContent = gameState.scrambledWord.toUpperCase();
+            
+            switchToPlayer2();
+          }, 1500);
+        } else {
+          gameState.player2Score++;
+          gameState.roundLocked = true;
+          
+          const player1Input = document.getElementById('player1Input');
+          const player2Input = document.getElementById('player2Input');
+          const player1Submit = document.getElementById('player1Submit');
+          const player2Submit = document.getElementById('player2Submit');
+          
+          player1Input.disabled = true;
+          player2Input.disabled = true;
+          player1Submit.disabled = true;
+          player2Submit.disabled = true;
+          
+          showBadgeAnimation();
+          updateScores();
+
+          setTimeout(() => {
+            gameState.currentRound++;
+            
+            if (gameState.currentRound > gameState.totalRounds) {
+              endGame();
+            } else {
+              updateRoundDisplay();
+              loadNextWord();
+            }
+          }, 2000);
+        }
+      } else {
+        input.classList.add('incorrect');
+        setTimeout(() => {
+          input.classList.remove('incorrect');
+        }, 500);
+      }
+    }
+
+    function checkSpelling(playerNum) {
+      if (gameState.roundLocked) return;
+
+      const input = document.getElementById(`player${playerNum}Input`);
+      const typed = input.value.toLowerCase().trim();
+      const target = gameState.currentWord.toLowerCase();
+
+      const progress = Math.min((typed.length / target.length) * 100, 100);
+      document.getElementById(`player${playerNum}Progress`).style.width = progress + '%';
+    }
+
+    function showBadgeAnimation() {
+      const badge = document.getElementById('badgeAnimation');
+      badge.classList.add('show');
+      setTimeout(() => {
+        badge.classList.remove('show');
+      }, 1000);
+    }
+
+    function updateScores() {
+      document.getElementById('player1Score').textContent = gameState.player1Score;
+      document.getElementById('player2Score').textContent = gameState.player2Score;
+    }
+
+    function updateRoundDisplay() {
+      const roundDisplay = document.getElementById('roundDisplay');
+      roundDisplay.textContent = `Round ${gameState.currentRound} of ${gameState.totalRounds}`;
+    }
+
+    function endGame() {
+      const victoryScreen = document.getElementById('victoryScreen');
+      const winnerName = document.getElementById('winnerName');
+      const finalScore = document.getElementById('finalScore');
+
+      let winner, score;
+      if (gameState.player1Score > gameState.player2Score) {
+        winner = document.getElementById('player1Name').textContent;
+        score = gameState.player1Score;
+      } else if (gameState.player2Score > gameState.player1Score) {
+        winner = document.getElementById('player2Name').textContent;
+        score = gameState.player2Score;
+      } else {
+        winner = "TIE - BOTH CHAMPIONS";
+        score = gameState.player1Score;
+      }
+
+      winnerName.textContent = winner;
+      finalScore.textContent = `${score} Bee Badge${score !== 1 ? 's' : ''}`;
+      victoryScreen.style.display = 'flex';
+    }
+
+    function resetGame() {
+      const victoryScreen = document.getElementById('victoryScreen');
+      victoryScreen.style.display = 'none';
+      
+      const setupScreen = document.getElementById('setupScreen');
+      setupScreen.style.display = 'flex';
+    }
+
+    document.getElementById('player1Input').addEventListener('input', () => checkSpelling(1));
+    document.getElementById('player2Input').addEventListener('input', () => checkSpelling(2));
+
+    async function onConfigChange(config) {
+      document.getElementById('gameTitle').textContent = config.game_title || defaultConfig.game_title;
+      document.getElementById('player1Name').textContent = config.player1_name || defaultConfig.player1_name;
+      document.getElementById('player2Name').textContent = config.player2_name || defaultConfig.player2_name;
+    }
+
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig: defaultConfig,
+        onConfigChange: onConfigChange,
+        mapToCapabilities: (config) => ({
+          recolorables: [],
+          borderables: [],
+          fontEditable: undefined,
+          fontSizeable: undefined
+        }),
+        mapToEditPanelValues: (config) => new Map([
+          ["game_title", config.game_title || defaultConfig.game_title],
+          ["player1_name", config.player1_name || defaultConfig.player1_name],
+          ["player2_name", config.player2_name || defaultConfig.player2_name]
+        ])
+      });
+    }
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9a6cacaa23e74fea',t:'MTc2NDUzMDEzNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
