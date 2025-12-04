@@ -669,6 +669,12 @@
       box-shadow: 0 0 20px rgba(58, 134, 255, 0.6);
       transform: translateY(-2px);
     }
+
+    .word-list-btn.active {
+      background: rgba(212, 175, 55, 0.4);
+      border-color: #d4af37;
+      box-shadow: 0 0 20px rgba(212, 175, 55, 0.6);
+    }
     
     .setup-section-label {
       font-size: 1.1em;
@@ -801,7 +807,7 @@
   <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
  </head>
  <body>
-    <!-- ⭐ LOGO — added here -->
+  <!-- ⭐ LOGO — added here -->
   <img src="logo.png" class="page-logo" alt="Logo">
   <div class="game-container"><!-- Honeycomb Background -->
    <svg class="honeycomb-bg" xmlns="http://www.w3.org/2000/svg"><defs>
@@ -821,6 +827,9 @@
       </div>
       <div class="player-name-input"><label class="input-label gold-label">Player 2 (Gold)</label> <input type="text" id="player2NameInput" class="name-input gold-input" placeholder="Enter name..." maxlength="20" value="Champion Gold">
       </div>
+     </div>
+     <p class="setup-section-label">Select Word List</p>
+     <div class="setup-options"><button class="round-btn word-list-btn active" id="list1Btn" onclick="selectWordList('list1')">List 1</button> <button class="round-btn word-list-btn" id="list2Btn" onclick="selectWordList('list2')">List 2</button> <button class="round-btn word-list-btn" id="list3Btn" onclick="selectWordList('list3')">List 3</button>
      </div>
      <p class="setup-section-label">Select Number of Rounds</p>
      <div class="setup-options"><button class="round-btn" onclick="startGame(5)">5 Rounds</button> <button class="round-btn" onclick="startGame(10)">10 Rounds</button> <button class="round-btn" onclick="startGame(15)">15 Rounds</button>
@@ -955,56 +964,136 @@
       player2_name: "Champion Gold"
     };
 
-    const words = {
-      "abdicate": "to give up power or responsibility",
-      "aberration": "something unusual or unexpected",
-      "abstain": "to choose not to do something",
-      "acquiesce": "to agree quietly or reluctantly",
-      "adversity": "difficulty or hardship",
-      "aesthetic": "related to beauty",
-      "alleviate": "to reduce pain or difficulty",
-      "ambivalent": "having mixed feelings",
-      "anomaly": "something that doesn't fit the pattern",
-      "antagonize": "to provoke or make someone angry",
-      "apathy": "lack of interest or feeling",
-      "arbitrary": "based on random choice, not reason",
-      "articulate": "able to express clearly",
-      "ascertain": "to find out for sure",
-      "aspiration": "a strong desire to achieve something",
-      "audacious": "bold, daring",
-      "authenticity": "the quality of being real or true",
-      "belligerent": "aggressive or hostile",
-      "benign": "harmless",
-      "boisterous": "noisy and energetic",
-      "candor": "honesty, truthfulness",
-      "catalyst": "something that causes change",
-      "censure": "strong criticism",
-      "circumvent": "to go around or avoid",
-      "coherent": "logical and clear",
-      "conducive": "making something more likely to happen",
-      "connoisseur": "an expert in a particular area",
-      "conspicuous": "easily seen or noticed",
-      "contemplate": "to think deeply",
-      "credible": "believable",
-      "cumulative": "increasing by adding little by little",
-      "debilitate": "to weaken",
-      "decree": "an official order",
-      "deference": "respectful submission",
-      "delineate": "to describe or outline clearly",
-      "denounce": "to publicly criticize",
-      "derivative": "not original; taken from something else",
-      "detrimental": "harmful",
-      "devious": "dishonest or tricky",
-      "digress": "to go off topic",
-      "diligent": "hard-working and careful",
-      "discern": "to recognize or identify",
-      "discord": "conflict or disagreement",
-      "discretion": "careful judgment",
-      "disparage": "to speak disrespectfully about something",
-      "disposition": "a person's mood or character",
-      "dormant": "inactive, sleeping (temporarily)",
-      "eccentric": "strange or unusual in behavior"
+    const wordLists = {
+      list1: {
+        "abdicate": "to give up power or responsibility",
+        "aberration": "something unusual or unexpected",
+        "abstain": "to choose not to do something",
+        "acquiesce": "to agree quietly or reluctantly",
+        "adversity": "difficulty or hardship",
+        "aesthetic": "related to beauty",
+        "alleviate": "to reduce pain or difficulty",
+        "ambivalent": "having mixed feelings",
+        "anomaly": "something that doesn't fit the pattern",
+        "antagonize": "to provoke or make someone angry",
+        "apathy": "lack of interest or feeling",
+        "arbitrary": "based on random choice, not reason",
+        "articulate": "able to express clearly",
+        "ascertain": "to find out for sure",
+        "aspiration": "a strong desire to achieve something",
+        "audacious": "bold, daring",
+        "authenticity": "the quality of being real or true",
+        "belligerent": "aggressive or hostile",
+        "benign": "harmless",
+        "boisterous": "noisy and energetic",
+        "candor": "honesty, truthfulness",
+        "catalyst": "something that causes change",
+        "censure": "strong criticism",
+        "circumvent": "to go around or avoid",
+        "coherent": "logical and clear",
+        "conducive": "making something more likely to happen",
+        "connoisseur": "an expert in a particular area",
+        "conspicuous": "easily seen or noticed",
+        "contemplate": "to think deeply",
+        "credible": "believable",
+        "cumulative": "increasing by adding little by little",
+        "debilitate": "to weaken",
+        "decree": "an official order",
+        "deference": "respectful submission",
+        "delineate": "to describe or outline clearly",
+        "denounce": "to publicly criticize",
+        "derivative": "not original; taken from something else",
+        "detrimental": "harmful",
+        "devious": "dishonest or tricky",
+        "digress": "to go off topic",
+        "diligent": "hard-working and careful",
+        "discern": "to recognize or identify",
+        "discord": "conflict or disagreement",
+        "discretion": "careful judgment",
+        "disparage": "to speak disrespectfully about something",
+        "disposition": "a person's mood or character",
+        "dormant": "inactive, sleeping (temporarily)",
+        "eccentric": "strange or unusual in behavior"
+      },
+      list2: {
+        "eloquent": "fluent and persuasive in speaking",
+        "emphatic": "expressing something with emphasis",
+        "endeavor": "an effort or attempt",
+        "entail": "to involve something as a necessary part",
+        "epiphany": "a sudden realization",
+        "equitable": "fair and equal",
+        "feasible": "possible, practical",
+        "fluctuate": "to change or vary continuously",
+        "formidable": "inspiring fear or respect",
+        "frivolous": "not serious or important",
+        "fundamental": "basic, essential",
+        "futile": "useless, producing no result",
+        "gratuitous": "unnecessary or uncalled for",
+        "gregarious": "sociable",
+        "heinous": "shockingly evil",
+        "hypocrisy": "pretending to have beliefs you don't",
+        "idiosyncrasy": "a strange habit",
+        "illicit": "illegal or forbidden",
+        "imperative": "absolutely necessary",
+        "implicit": "suggested but not stated",
+        "inadvertent": "unintentional",
+        "incessant": "continuing without stopping",
+        "incite": "to encourage violent or harmful behavior",
+        "incompetent": "not capable",
+        "incredible": "hard to believe",
+        "inevitable": "certain to happen",
+        "inferior": "lower in quality",
+        "ingenious": "very clever",
+        "innate": "natural, inborn",
+        "insightful": "showing deep understanding",
+        "instigate": "to provoke or start",
+        "integral": "essential, necessary",
+        "intermittent": "occurring at irregular intervals",
+        "intrepid": "fearless",
+        "judicious": "showing good judgment",
+        "lament": "to express sorrow",
+        "lucrative": "profitable",
+        "magnanimous": "generous, forgiving",
+        "meticulous": "very careful about details",
+        "morose": "gloomy, sad",
+        "mundane": "ordinary, boring",
+        "negligent": "careless",
+        "notorious": "well-known for something bad",
+        "oblivious": "unaware",
+        "obsolete": "no longer useful",
+        "omnipotent": "all-powerful",
+        "onus": "a responsibility or burden",
+        "optimistic": "expecting good things"
+      },
+      list3: {
+        "ornate": "highly decorated",
+        "ostracize": "exclude from a group",
+        "paradox": "a statement that seems impossible but is true",
+        "perpetual": "never ending",
+        "pertinent": "relevant",
+        "plausible": "believable",
+        "precocious": "advanced for one's age",
+        "proclaim": "to announce publicly",
+        "procrastinate": "to delay doing something",
+        "profound": "deep, meaningful",
+        "prohibit": "to forbid",
+        "propel": "to push forward",
+        "quaint": "charmingly old-fashioned",
+        "rational": "logical and reasonable",
+        "reconcile": "to make peace",
+        "redundant": "no longer needed",
+        "refute": "to prove wrong",
+        "relinquish": "to give up",
+        "reluctant": "unwilling",
+        "resilient": "able to recover quickly",
+        "scrutinize": "examine very closely",
+        "simultaneous": "happening at the same time",
+        "substantiate": "to provide evidence",
+        "vindicate": "to prove someone right or free them from blame"
+      }
     };
+
+    let selectedWords = wordLists.list1;
 
     let gameState = {
       totalRounds: 10,
@@ -1034,7 +1123,17 @@
     }
 
     function getWordKeys() {
-      return Object.keys(words);
+      return Object.keys(selectedWords);
+    }
+
+    function selectWordList(listName) {
+      selectedWords = wordLists[listName];
+      
+      // Update button states
+      document.getElementById('list1Btn').classList.remove('active');
+      document.getElementById('list2Btn').classList.remove('active');
+      document.getElementById('list3Btn').classList.remove('active');
+      document.getElementById(listName + 'Btn').classList.add('active');
     }
 
     function scrambleWord(word) {
@@ -1191,7 +1290,7 @@
       }
 
       gameState.currentWord = gameState.wordPool.pop();
-      gameState.currentDefinition = words[gameState.currentWord];
+      gameState.currentDefinition = selectedWords[gameState.currentWord];
       gameState.scrambledWord = scrambleWord(gameState.currentWord);
       gameState.roundLocked = false;
       gameState.currentPlayer = 1;
@@ -1474,5 +1573,5 @@
       });
     }
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9a7271d1929783a0',t:'MTc2NDU5MDY0MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9a894f2b43d35bcc',t:'MTc2NDgzMDM5NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
